@@ -8,9 +8,13 @@ in a web browser to automate the download.
 
 After the script finishes, copy the CSV files
 from your downloads folder to a better place.
+
+Note: Stations and trips require different processes
+since trips come as ZIP files while stations is a 
+non-zipped CSV file.
 """
 
-import bs4
+from bs4 import BeautifulSoup
 import requests
 import webbrowser
 import pandas as pd
@@ -20,7 +24,7 @@ from pathlib import Path
 DATA_URL = "https://www.rideindego.com/about/data/"
 
 
-def _get_soup(url):
+def _get_soup(url: str) -> BeautifulSoup:
     """
     Connect to URL with requests/bs4
     Headers are needed to prevent a 403 response
@@ -30,15 +34,17 @@ def _get_soup(url):
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:86.0) Gecko/20100101 Firefox/86.0"
     }
     page = requests.get(url, headers=headers)
-    soup = bs4.BeautifulSoup(page.content, "html.parser")
 
-    return soup
+    return BeautifulSoup(page.content, "html.parser")
 
 
 def stations():
-    soup = _get_soup(DATA_URL)
+    """
+    Download Station data to a single CSV file
+    named "stations.csv", within your Downloads folder
+    """
 
-    print("-> Downloading STATION data")
+    soup = _get_soup(DATA_URL)
 
     station_info_tag = None
     for x in soup.find_all("h1"):
@@ -56,16 +62,19 @@ def stations():
     df.columns = data[0]
 
     df.dropna(inplace=True)
-    df.to_csv(Path.home() / "Downloads" / "stations.csv")
+
+    outpath = Path.home() / "Downloads" / "stations.csv"
+
+    df.to_csv(outpath, index=False)
 
 
 def trips():
     """
     Download the TRIP csv files (one per quarter per year)
+    to your Downloads folder
     """
-    soup = _get_soup(DATA_URL)
 
-    print("-> Downloading TRIP data")
+    soup = _get_soup(DATA_URL)
 
     data_list = soup.find("section", class_="entry-content").find_next("ul").find_all("a")
     href_list = [a["href"] for a in data_list]
@@ -75,8 +84,9 @@ def trips():
 
 
 def main():
+    """Download station and trip files"""
     stations()
-    trips()
+    # trips()
 
 
 if __name__ == "__main__":
