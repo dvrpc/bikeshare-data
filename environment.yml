@@ -1,0 +1,16 @@
+name: bikeshare-data
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8*
+  - flake8
+  - ipython
+  - jupyterlab
+  - black
+  - requests
+  - beautifulsoup4
+  - click
+  - pandas
+  - pip
+  - pip:
+      - --editable .
