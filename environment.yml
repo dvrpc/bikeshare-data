@@ -11,6 +11,8 @@ dependencies:
   - beautifulsoup4
   - click
   - pandas
+  - psycopg2
+  - sqlalchemy
   - pip
   - pip:
       - --editable .
