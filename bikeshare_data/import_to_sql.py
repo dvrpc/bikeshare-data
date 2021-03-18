@@ -32,25 +32,35 @@ def sql_manipulations():
         """
             CREATE EXTENSION IF NOT EXISTS postgis;
         """,
+        """
+            DROP TABLE IF EXISTS trips CASCADE;
+            CREATE TABLE trips AS TABLE raw_trips;
+        """,
         # Start Station ID column name changed over time...
         # ... this gets it all into one column
         """
-            UPDATE trips 
-            SET start_station_id = start_station
-            WHERE start_station_id IS NULL;
+            UPDATE trips
+            SET start_station = start_station_id
+            WHERE start_station IS NULL;
         """,
         # Same for End Station ID column
         """
-            UPDATE trips 
-            SET end_station_id = end_station
-            WHERE end_station_id IS NULL;
+            UPDATE trips
+            SET end_station = end_station_id
+            WHERE end_station IS NULL;
         """,
         # Add geom columns for start and end of trip
         """
             ALTER TABLE trips
+            DROP COLUMN IF EXISTS start_geom;
+            
+            ALTER TABLE trips
             ADD COLUMN start_geom geometry(Point, 4326);
         """,
         """
+            ALTER TABLE trips
+            DROP COLUMN IF EXISTS end_geom;
+            
             ALTER TABLE trips
             ADD COLUMN end_geom geometry(Point, 4326);
         """,
@@ -60,8 +70,8 @@ def sql_manipulations():
             SET start_geom = 
             ST_SetSRID(
                 ST_MakePoint(
-                    start_lon::float,
-                    start_lat::float
+                    round(start_lon::numeric, 5),
+                    round(start_lat::numeric, 5)
                 ),
                 4326
             )
@@ -72,22 +82,12 @@ def sql_manipulations():
             SET end_geom = 
             ST_SetSRID(
                 ST_MakePoint(
-                    end_lon::float,
-                    end_lat::float
+                    round(end_lon::numeric, 5),
+                    round(end_lat::numeric, 5)
                 ),
                 4326
             )
             WHERE end_station_id > 3000 AND end_station_id < 9000;
-        """,
-        # Create a view with trip records that have start and end geoms...
-        # ... since not all of them have usable lat/lon on both trip ends
-        """
-            DROP VIEW IF EXISTS trips_w_geom;
-            CREATE VIEW trips_w_geom AS
-                SELECT *
-                FROM trips
-                WHERE start_geom IS NOT NULL
-                    AND end_geom IS NOT NULL
         """,
     ]
     for q in queries:
@@ -95,7 +95,7 @@ def sql_manipulations():
 
 
 def main():
-    csv_to_postgres()
+    # csv_to_postgres()
     sql_manipulations()
 
 
