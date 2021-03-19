@@ -75,7 +75,7 @@ def sql_manipulations():
                 ),
                 4326
             )
-            WHERE start_station_id > 3000 AND start_station_id < 9000;
+            WHERE start_station > 3000 AND start_station < 9000;
         """,
         """
             UPDATE trips
@@ -87,7 +87,7 @@ def sql_manipulations():
                 ),
                 4326
             )
-            WHERE end_station_id > 3000 AND end_station_id < 9000;
+            WHERE end_station > 3000 AND end_station < 9000;
         """,
     ]
     for q in queries:
