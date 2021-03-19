@@ -26,6 +26,34 @@ def _execute_query(sql: str, uri: str = DEFAULT_DB_URI) -> None:
     connection.close()
 
 
+def _get_query_result(sql: str, uri: str = DEFAULT_DB_URI) -> list:
+    """
+    Use psycopg2 to extract the result of a query into a list of lists
+    """
+
+    connection = psycopg2.connect(uri)
+    cursor = connection.cursor()
+
+    cursor.execute(sql)
+
+    result = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return [list(x) for x in result]
+
+
+def _get_gdf(sql: str, uri: str = DEFAULT_DB_URI) -> GeoDataFrame:
+    connection = psycopg2.connect(uri)
+
+    gdf = GeoDataFrame.from_postgis(sql, connection, geom_col="geom")
+
+    connection.close()
+
+    return gdf
+
+
 def _import_df(
     df: DataFrame, sql_tablename: str, if_exists: str, uri: str = DEFAULT_DB_URI
 ) -> None:
