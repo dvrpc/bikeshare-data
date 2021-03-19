@@ -66,5 +66,6 @@ def _import_gdf(
         sql_tablename,
         engine,
         dtype={"geom": Geometry(geom_type.upper(), srid=epsg_code)},
+        if_exists="replace",
     )
     engine.dispose()
