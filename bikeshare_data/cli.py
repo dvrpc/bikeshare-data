@@ -1,5 +1,7 @@
+from os import stat
 import click
-from bikeshare_data.scrape import main as _scrape
+from bikeshare_data.scrape_trips import trips
+from bikeshare_data.scrape_stations import station_geojson
 from bikeshare_data.import_to_sql import main as _import
 
 
@@ -10,9 +12,15 @@ def main():
 
 
 @main.command()
-def scrape():
-    """Download CSV files from Indego's website"""
-    _scrape()
+def scrape_trips():
+    """Download trip data as CSVs from Indego's website"""
+    trips()
+
+
+@main.command()
+def scrape_stations():
+    """Import station geojson directly to SQL"""
+    station_geojson()
 
 
 @main.command()
