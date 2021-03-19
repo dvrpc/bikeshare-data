@@ -3,7 +3,7 @@ import psycopg2
 import sqlalchemy
 from pandas import DataFrame
 from datetime import datetime
-import geopandas as gpd
+from geopandas import GeoDataFrame
 from geoalchemy2 import WKTElement, Geometry
 
 from bikeshare_data import DEFAULT_DB_URI
@@ -48,10 +48,12 @@ def _import_df(
     print("\t -> Ended at", datetime.now())
 
 
-def _import_polygon_shapefile(
-    polygon_shp_path: Path, sql_tablename: str = "study_area", uri: str = DEFAULT_DB_URI
+def _import_gdf(
+    gdf: GeoDataFrame, sql_tablename: str, geom_type: str, uri: str = DEFAULT_DB_URI
 ) -> None:
-    gdf = gpd.read_file(polygon_shp_path)
+    """
+    Import a geopandas GeoDataFrame to SQL
+    """
 
     gdf.columns = [x.lower() for x in gdf.columns]
     epsg_code = int(str(gdf.crs).split(":")[1])
@@ -63,6 +65,6 @@ def _import_polygon_shapefile(
     gdf.to_sql(
         sql_tablename,
         engine,
-        dtype={"geom": Geometry("POLYGON", srid=epsg_code)},
+        dtype={"geom": Geometry(geom_type.upper(), srid=epsg_code)},
     )
     engine.dispose()
