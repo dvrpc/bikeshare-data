@@ -20,6 +20,10 @@ import webbrowser
 import pandas as pd
 import csv
 from pathlib import Path
+import geopandas as gpd
+from shapely.geometry import shape
+
+from bikeshare_data.helpers import _import_gdf
 
 DATA_URL = "https://www.rideindego.com/about/data/"
 
@@ -38,7 +42,7 @@ def _get_soup(url: str) -> BeautifulSoup:
     return BeautifulSoup(page.content, "html.parser")
 
 
-def stations():
+def station_csv():
     """
     Download Station data to a single CSV file
     named "stations.csv", within your Downloads folder
@@ -68,6 +72,21 @@ def stations():
     df.to_csv(outpath, index=False)
 
 
+def station_geojson():
+    res = requests.get("https://kiosks.bicycletransit.workers.dev/phl.geojson")
+    data = res.json()
+    for d in data["features"]:
+        d["geometry"] = shape(d["geometry"])
+        for k in d["properties"]:
+            d[k] = d["properties"][k]
+        del d["properties"]
+        d["bikes"] = str(d["bikes"])
+    gdf = gpd.GeoDataFrame(data["features"]).set_geometry("geometry")
+    gdf.set_crs(epsg=4326, inplace=True)
+
+    _import_gdf(gdf, "station_shapes", "Point")
+
+
 def trips():
     """
     Download the TRIP csv files (one per quarter per year)
@@ -85,7 +104,8 @@ def trips():
 
 def main():
     """Download station and trip files"""
-    stations()
+    # station_csv()
+    station_geojson()
     # trips()
 
 
