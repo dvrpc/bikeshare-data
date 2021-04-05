@@ -56,6 +56,12 @@ indego import-to-sql
 indego scrape-stations
 ```
 
+### 4) Generate `xlsx` output files:
+
+```
+indego analyze
+```
+
 ## Notes
 
 The study area boundary is defined using WKT to facilitate future integration into a backend API that will communicate with a webmap frontend where users point/click to define a custom study area.
@@ -67,8 +73,17 @@ The study area boundary is defined using WKT to facilitate future integration in
 let my_wkt = wellknown.stringify(data.features[0].geometry);
 ```
 
-This returns something like:
+This returns a well-known-text description of the shape:
 
 ```
-POLYGON ((-91.8466200103753 42.76567129175277, -91.87048094177136 42.75911775240124, -91.86721937560942 42.7526895693039, -91.83185713195711 42.75621885041684, -91.8466200103753 42.76567129175277))
+POLYGON ((-75.179070999792 39.9561219999082,-75.179121999973 39.9559839999298,-75.1793000003484 39.9559849996663))
+```
+
+To work with spatial queries, wrap the WKT within:
+
+```
+ST_SetSRID(
+    ST_GeomFromText('my_wkt'),
+    4326
+)
 ```
