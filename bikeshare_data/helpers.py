@@ -1,8 +1,8 @@
 from pathlib import Path
 import psycopg2
 import sqlalchemy
-from pandas import DataFrame
 from datetime import datetime
+import pandas as pd
 from geopandas import GeoDataFrame
 from geoalchemy2 import WKTElement, Geometry
 
@@ -44,6 +44,20 @@ def _get_query_result(sql: str, uri: str = DEFAULT_DB_URI) -> list:
     return [list(x) for x in result]
 
 
+def _get_df(sql: str, uri: str = DEFAULT_DB_URI) -> pd.DataFrame:
+    """
+    Use pandas to get a dataframe from a query
+    """
+
+    engine = sqlalchemy.create_engine(uri)
+
+    df = pd.read_sql(sql, engine)
+
+    engine.dispose()
+
+    return df
+
+
 def _get_gdf(sql: str, uri: str = DEFAULT_DB_URI) -> GeoDataFrame:
     """
     Use geopandas to get a geodataframe from a query
@@ -59,7 +73,7 @@ def _get_gdf(sql: str, uri: str = DEFAULT_DB_URI) -> GeoDataFrame:
 
 
 def _import_df(
-    df: DataFrame, sql_tablename: str, if_exists: str, uri: str = DEFAULT_DB_URI
+    df: pd.DataFrame, sql_tablename: str, if_exists: str, uri: str = DEFAULT_DB_URI
 ) -> None:
 
     """
