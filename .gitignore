@@ -131,3 +131,5 @@ dmypy.json
 *.ipynb
 *.csv
 settings.json
+*.xlsx
+*.csv
