@@ -15,6 +15,7 @@ dependencies:
   - sqlalchemy
   - geopandas
   - geoalchemy2
+  - python-dotenv
   - pip
   - pip:
       - --editable .
