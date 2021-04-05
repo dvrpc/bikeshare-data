@@ -26,7 +26,39 @@ Activate the environment:
 conda activate bikeshare-data
 ```
 
+Create a `.env` file to store configuration parameters:
+
+```
+DEFAULT_DB_URI = postgresql://postgres:password@localhost:5432/indego
+DEFAULT_DATA_FOLDER = /path/to/data/dir
+STUDY_AREA = "ST_SetSRID(ST_GeomFromText('POLYGON((-75.179070999792 39.9561219999082, ...etc...))'), 4326)"
+```
+
+## Usage
+
+### 1) Download all CSV files hosted on [Indego's data page](https://www.rideindego.com/about/data/):
+
+```
+indego scrape-trips
+```
+
+This will download all CSV files to your computer's `Downloads` folder. Cut and paste these files into the `DEFAULT_DATA_FOLDER` before continuing to the next step.
+
+### 2 ) To import the CSV files into SQL, run:
+
+```
+indego import-to-sql
+```
+
+### 3) Load the authoritative station geojson file directly to SQL with:
+
+```
+indego scrape-stations
+```
+
 ## Notes
+
+The study area boundary is defined using WKT to facilitate future integration into a backend API that will communicate with a webmap frontend where users point/click to define a custom study area.
 
 ```
 <script src="https://cdn.rawgit.com/mapbox/wellknown/master/wellknown.js"></script>
