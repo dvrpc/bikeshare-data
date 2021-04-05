@@ -45,6 +45,10 @@ def _get_query_result(sql: str, uri: str = DEFAULT_DB_URI) -> list:
 
 
 def _get_gdf(sql: str, uri: str = DEFAULT_DB_URI) -> GeoDataFrame:
+    """
+    Use geopandas to get a geodataframe from a query
+    """
+
     connection = psycopg2.connect(uri)
 
     gdf = GeoDataFrame.from_postgis(sql, connection, geom_col="geom")
