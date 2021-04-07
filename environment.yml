@@ -17,6 +17,7 @@ dependencies:
   - geoalchemy2
   - python-dotenv
   - openpyxl
+  - xlsxwriter
   - pip
   - pip:
       - --editable .
