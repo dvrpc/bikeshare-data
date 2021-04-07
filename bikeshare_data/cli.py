@@ -31,6 +31,10 @@ def import_to_sql():
 
 
 @main.command()
-def analyze():
+@click.option(
+    "--include-inactive", "-i", is_flag=True, help="Flag to include inactive kiosks in analysis"
+)
+@click.option("--write", "-w", is_flag=True, help="Flag to write output .xlsx files")
+def analyze(include_inactive, write):
     """Analyze trip patterns for selected stations """
-    _analyze_trips()
+    _analyze_trips(write_output_files=write, include_inactive_stations=include_inactive)
