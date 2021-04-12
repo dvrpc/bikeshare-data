@@ -1,3 +1,4 @@
+import xlsxwriter
 from pathlib import Path
 import pandas as pd
 
@@ -229,9 +230,13 @@ def analyze_trips(
                 # Write the data table from pandas to excel
                 sheet_name = f"trips_{int(station_id)}"
                 filtered_df = df[df["station_id"] == station_id]
-                filtered_df.pivot(
+                pivoted_df = filtered_df.pivot(
                     index=["y", "m"], columns=["trip_type"], values="trips"
-                ).T.to_excel(writer, sheet_name=sheet_name)
+                ).T
+                pivoted_df.to_excel(writer, sheet_name=sheet_name)
+
+                # Get the letter-based representation of the final column
+                end_col = xlsxwriter.utility.xl_col_to_name(len(pivoted_df.columns))
 
                 # Create the stacked column chart
                 chart = workbook.add_chart({"type": "column", "subtype": "stacked"})
@@ -239,8 +244,8 @@ def analyze_trips(
                     chart.add_series(
                         {
                             "name": series_name,
-                            "values": f"={sheet_name}!B{row_num}:AT{row_num}",
-                            "categories": f"={sheet_name}!B1:AT2",
+                            "values": f"={sheet_name}!B{row_num}:{end_col}{row_num}",
+                            "categories": f"={sheet_name}!B1:{end_col}2",
                         }
                     )
 
