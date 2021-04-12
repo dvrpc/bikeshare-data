@@ -44,10 +44,14 @@ def sql_manipulations():
             DROP TABLE IF EXISTS trips CASCADE;
             CREATE TABLE trips AS (
                 SELECT * FROM raw_trips
-                WHERE end_station > 3000
+                WHERE (end_station > 3000
                   AND end_station < 9000
                   AND start_station > 3000
-                  AND start_station < 9000
+                  AND start_station < 9000)
+                OR (end_station_id > 3000
+                  AND end_station_id < 9000
+                  AND start_station_id > 3000
+                  AND start_station_id < 9000)
             );
         """,
         # Start Station ID column name changed over time...
@@ -63,42 +67,6 @@ def sql_manipulations():
             SET end_station = end_station_id
             WHERE end_station IS NULL;
         """,
-        # # Add geom columns for start and end of trip
-        # """
-        #     ALTER TABLE trips
-        #     DROP COLUMN IF EXISTS start_geom;
-        #     ALTER TABLE trips
-        #     ADD COLUMN start_geom geometry(Point, 4326);
-        # """,
-        # """
-        #     ALTER TABLE trips
-        #     DROP COLUMN IF EXISTS end_geom;
-        #     ALTER TABLE trips
-        #     ADD COLUMN end_geom geometry(Point, 4326);
-        # """,
-        # # Update geom columns to hold a point for start/end
-        # """
-        #     UPDATE trips
-        #     SET start_geom =
-        #     ST_SetSRID(
-        #         ST_MakePoint(
-        #             round(start_lon::numeric, 5),
-        #             round(start_lat::numeric, 5)
-        #         ),
-        #         4326
-        #     )
-        # """,
-        # """
-        #     UPDATE trips
-        #     SET end_geom =
-        #     ST_SetSRID(
-        #         ST_MakePoint(
-        #             round(end_lon::numeric, 5),
-        #             round(end_lat::numeric, 5)
-        #         ),
-        #         4326
-        #     )
-        # """,
     ]
     for q in queries:
         _execute_query(q)
