@@ -34,6 +34,8 @@ DEFAULT_DATA_FOLDER = /path/to/data/dir
 STUDY_AREA = "ST_SetSRID(ST_GeomFromText('POLYGON((-75.179070999792 39.9561219999082, ...etc...))'), 4326)"
 ```
 
+Make sure that the database defined by `DEFAULT_DB_URI` already exists and that the `postgis` extension can be (or has been) enabled.
+
 ## Usage
 
 ### 1) Download all CSV files hosted on [Indego's data page](https://www.rideindego.com/about/data/):
@@ -50,11 +52,15 @@ This will download all CSV files to your computer's `Downloads` folder. Cut and 
 indego import-to-sql
 ```
 
+This imports all CSVs into a single table named `raw_trips` with 4.3 million rows (as of 8/2021), and then generates a cleaned up version named `trips`. This will take approximately 8 minutes to run.
+
 ### 3) Load the authoritative station geojson file directly to SQL with:
 
 ```
 indego scrape-stations
 ```
+
+This creates a spatial table in the database named `station_shapes`
 
 ### 4) Generate `xlsx` output files:
 
