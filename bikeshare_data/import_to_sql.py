@@ -12,17 +12,24 @@ def csv_to_postgres(data_folder: Path = DEFAULT_DATA_FOLDER) -> None:
 
     trip_dfs = []
 
-    for f in data_folder.glob("*.csv"):
-        if f.name == "stations.csv":
+    # Read all csv files, including those nested in sub-folders
+    for f in data_folder.rglob("*.csv"):
+
+        # If the word 'stations' shows up in the filename,
+        # import it as its own table named 'stations'
+        if "stations" in str(f.name).lower():
             df = pd.read_csv(f)
             df["src_file"] = f.stem
             _import_df(df, "stations", if_exists="replace")
+        # Otherwise, assume it's a trip file that will get
+        # merged into one mega table with all other trip files
         else:
             print("Reading", f.name)
             df = pd.read_csv(f)
             df["src_file"] = f.stem
             trip_dfs.append(df)
 
+    # After reading all files, merge them into one table and import to SQL
     all_trips_df = pd.concat(trip_dfs, ignore_index=True)
     _import_df(all_trips_df, "raw_trips", if_exists="replace")
 
